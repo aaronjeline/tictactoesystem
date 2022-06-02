@@ -1,6 +1,8 @@
 use crate::board::*;
 use crate::game::*;
 
+
+
 pub struct Minimax {
     me: Player,
 }
@@ -40,18 +42,13 @@ impl Minimax {
     fn is_end_of_game(&self, board: &Board, depth: usize) -> Option<i32> {
         let depth = depth as i32;
         match board.check_winner() {
-            Some(winner) => Some(if winner == self.me {
+            GameState::Winner(winner) => Some(if winner == self.me {
                 10 - depth
             } else {
                 -10 - depth
             }),
-            None => {
-                if board.out_of_moves() {
-                    Some(0)
-                } else {
-                    None
-                }
-            }
+            GameState::Tie => Some(0),
+            GameState::InProgress => None,
         }
     }
 }
@@ -79,20 +76,22 @@ impl MinMax {
 
 impl GamePlayer for Minimax {
     fn make_move(&self, board: &Board) -> Move {
-        for (x, y) in board.available_moves() {
-            println!(
-                "Moving to ({},{}) has score {}",
-                x,
-                y,
-                self.minimax(&make_move(board, (x, y)), 0, MinMax::Max)
-            );
-        }
 
-        board
+        let next_move = board
             .available_moves()
             .into_iter()
-            .map(|x| x)
-            .max_by_key(|m| self.minimax(&make_move(board, *m), 1, MinMax::Max))
-            .unwrap()
+            .max_by_key(|m| self.minimax(&make_move(board, *m), 1, MinMax::Min));
+        
+        match next_move {
+            Some(m) => m,
+            None => {
+                println!("{board}");
+                panic!("No moves available");
+            }
+        }
+    }
+
+    fn name(&self) -> &'static str {
+        "Minimax"
     }
 }

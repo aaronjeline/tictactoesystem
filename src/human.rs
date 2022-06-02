@@ -15,7 +15,13 @@ impl GamePlayer for HumanPlayer {
         print!("{}\nEnter move:\n", board);
         get_stdin()
     }
+
+    fn name(&self) -> &'static str {
+        "Human"
+    }
 }
+
+
 fn get_stdin() -> (usize, usize) {
     let mut input = String::new();
     std::io::stdin()

@@ -2,10 +2,10 @@ mod board;
 mod game;
 mod human;
 mod minimax;
-
+mod random;
+use std::rc::Rc;
 fn main() {
-    let me = Box::new(human::HumanPlayer::new());
-    let computer = Box::new(minimax::Minimax::new(board::Player::O));
-    let mut game = game::Game::new(me, computer);
-    game.run_game();
+    let me = Rc::new(random::Random::new());
+    let computer = Rc::new(minimax::Minimax::new(board::Player::O));
+    game::Game::run_games(100, me, computer);
 }
